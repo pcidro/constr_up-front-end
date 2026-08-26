@@ -1,8 +1,33 @@
 <script setup lang="ts">
 import Header from "./components/Header/Header.vue";
+import ProductList from "./components/ProductList/ProductList.vue";
+import { ref, onMounted } from "vue";
+import api from "./services/api.ts";
+import type { Product } from "./types/productType";
+
+const products = ref<Product[]>([]);
+const loading = ref(false);
+
+async function fetchProducts() {
+  loading.value = true;
+  try {
+    const response = await api.get("/products");
+    products.value = response.data;
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(() => {
+  fetchProducts();
+});
 </script>
 
 <template>
   <Header />
-  <main class="container"></main>
+  <main class="container">
+    <ProductList :products="products" :loading="loading" />
+  </main>
 </template>
