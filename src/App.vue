@@ -33,6 +33,7 @@ onMounted(() => {
       :products="products"
       :loading="loading"
       @deleted="fetchProducts"
+      @refresh="fetchProducts"
     />
     <ProductModal
       :is-open="isModalOpen"

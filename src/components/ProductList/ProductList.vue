@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { Pencil, Trash2 } from "lucide-vue-next";
 import { productService } from "../../services/productService";
 import type { Product } from "../../types/productType";
+import EditProductModal from "../EditProductModal/EditProductModal.vue";
+const isEditModalOpen = ref(false);
+const selectedProduct = ref<Product | null>(null);
+
 defineProps<{
   products: Product[];
   loading?: boolean;
@@ -9,6 +15,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: "edit", product: Product): void;
   (e: "deleted"): void;
+  (e: "refresh"): void;
 }>();
 
 async function handleDelete(id?: number) {
@@ -22,6 +29,11 @@ async function handleDelete(id?: number) {
     console.error("Erro ao excluir:", error);
     alert("Erro ao excluir produto.");
   }
+}
+
+function handleOpenEdit(product: Product) {
+  selectedProduct.value = product;
+  isEditModalOpen.value = true;
 }
 </script>
 
@@ -56,20 +68,26 @@ async function handleDelete(id?: number) {
           </td>
           <td class="text-center">
             <div class="actions-wrapper">
-              <button @click="emit('edit', product)" class="action-btn edit">
-                Editar
+              <button @click="handleOpenEdit(product)" class="action-btn edit">
+                <Pencil :size="18" />
               </button>
               <button
                 @click="handleDelete(product.id)"
                 class="action-btn delete"
               >
-                Excluir
+                <Trash2 :size="18" color="red" />
               </button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
+    <EditProductModal
+      :is-open="isEditModalOpen"
+      :product="selectedProduct"
+      @close="isEditModalOpen = false"
+      @saved="emit('refresh')"
+    />
   </div>
 </template>
 
