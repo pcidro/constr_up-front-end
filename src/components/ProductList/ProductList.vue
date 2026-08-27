@@ -1,3 +1,30 @@
+<script setup lang="ts">
+import { productService } from "../../services/productService";
+import type { Product } from "../../types/productType";
+defineProps<{
+  products: Product[];
+  loading?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "edit", product: Product): void;
+  (e: "deleted"): void;
+}>();
+
+async function handleDelete(id?: number) {
+  if (!id) return;
+  if (!confirm("Deseja realmente excluir este produto?")) return;
+
+  try {
+    await productService.delete(id);
+    emit("deleted");
+  } catch (error) {
+    console.error("Erro ao excluir:", error);
+    alert("Erro ao excluir produto.");
+  }
+}
+</script>
+
 <template>
   <div class="table-container">
     <table class="table">
@@ -33,7 +60,7 @@
                 Editar
               </button>
               <button
-                @click="emit('delete', product.id)"
+                @click="handleDelete(product.id)"
                 class="action-btn delete"
               >
                 Excluir
@@ -49,16 +76,3 @@
 <style scoped>
 @import "./ProductList.css";
 </style>
-
-<script setup lang="ts">
-import type { Product } from "../../types/productType";
-defineProps<{
-  products: Product[];
-  loading?: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: "edit", product: Product): void;
-  (e: "delete", id: number | undefined): void;
-}>();
-</script>

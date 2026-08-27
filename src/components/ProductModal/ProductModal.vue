@@ -119,7 +119,6 @@ async function handleSubmit() {
             <button type="submit" class="btn-save" :disabled="loading">
               {{ loading ? "Salvando..." : "Salvar Produto" }}
             </button>
-            <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
           </div>
         </form>
       </div>

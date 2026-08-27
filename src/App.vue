@@ -29,7 +29,11 @@ onMounted(() => {
 <template>
   <Header @open-modal="isModalOpen = true" />
   <main class="container">
-    <ProductList :products="products" :loading="loading" />
+    <ProductList
+      :products="products"
+      :loading="loading"
+      @deleted="fetchProducts"
+    />
     <ProductModal
       :is-open="isModalOpen"
       @close="isModalOpen = false"
