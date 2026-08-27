@@ -1,7 +1,12 @@
 <template>
   <header class="header">
-    <h1>Constr Up</h1>
-    <p>Liste, edite e adicione produtos ao estoque</p>
+    <div class="header-info">
+      <h1 class="header-title">Constr Up</h1>
+      <p class="header-subtitle">Liste, edite e adicione produtos ao estoque</p>
+    </div>
+    <button class="btn-add">
+      <span>Adicionar produto</span>
+    </button>
   </header>
 </template>
 
