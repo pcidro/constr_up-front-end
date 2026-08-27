@@ -87,3 +87,10 @@
 .error-text {
   color: red;
 }
+
+.error-msg {
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 2px;
+}

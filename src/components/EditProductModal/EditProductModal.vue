@@ -2,6 +2,7 @@
 import { ref, watch } from "vue";
 import type { Product } from "../../types/productType";
 import { productService } from "../../services/productService";
+import axios from "axios";
 
 const props = defineProps<{
   isOpen: boolean;
@@ -15,6 +16,7 @@ const emit = defineEmits<{
 
 const loading = ref(false);
 const errorMessage = ref("");
+const errors = ref<Record<string, string[]>>({});
 
 const form = ref<Product>({
   name: "",
@@ -35,6 +37,8 @@ watch(
 );
 
 function handleClose() {
+  errors.value = {};
+  errorMessage.value = "";
   emit("close");
 }
 
@@ -43,15 +47,19 @@ async function handleSubmit() {
 
   loading.value = true;
   errorMessage.value = "";
+  errors.value = {};
 
   try {
     await productService.update(props.product.id, form.value);
     emit("saved");
     handleClose();
   } catch (error) {
-    console.error("Erro ao atualizar produto:", error);
-    errorMessage.value =
-      "Não foi possível atualizar o produto. Tente novamente.";
+    if (axios.isAxiosError(error) && error.response?.status === 422) {
+      errors.value = error.response.data.errors;
+    } else {
+      errorMessage.value =
+        "Não foi possível atualizar o produto. Tente novamente.";
+    }
   } finally {
     loading.value = false;
   }
@@ -67,15 +75,21 @@ async function handleSubmit() {
           <button class="modal-close-btn" @click="handleClose">&times;</button>
         </div>
 
-        <form @submit.prevent="handleSubmit" class="modal-form">
+        <form @submit.prevent="handleSubmit" class="modal-form" novalidate>
           <div class="form-group">
             <label for="edit-name">Nome do Produto</label>
-            <input id="edit-name" v-model="form.name" type="text" required />
+            <input id="edit-name" v-model="form.name" type="text" />
+            <span v-if="errors.name" class="error-msg">{{
+              errors.name[0]
+            }}</span>
           </div>
 
           <div class="form-group">
             <label for="edit-brand">Marca</label>
-            <input id="edit-brand" v-model="form.brand" type="text" required />
+            <input id="edit-brand" v-model="form.brand" type="text" />
+            <span v-if="errors.brand" class="error-msg">{{
+              errors.brand[0]
+            }}</span>
           </div>
 
           <div class="form-row">
@@ -86,8 +100,10 @@ async function handleSubmit() {
                 v-model="form.price"
                 type="number"
                 step="0.01"
-                required
               />
+              <span v-if="errors.price" class="error-msg">{{
+                errors.price[0]
+              }}</span>
             </div>
 
             <div class="form-group">
@@ -96,8 +112,10 @@ async function handleSubmit() {
                 id="edit-stock"
                 v-model="form.stock"
                 type="number"
-                required
               />
+              <span v-if="errors.stock" class="error-msg">{{
+                errors.stock[0]
+              }}</span>
             </div>
           </div>
 
@@ -108,6 +126,9 @@ async function handleSubmit() {
               v-model="form.description"
               rows="3"
             ></textarea>
+            <span v-if="errors.description" class="error-msg">{{
+              errors.description[0]
+            }}</span>
           </div>
 
           <div class="modal-actions">
@@ -123,6 +144,7 @@ async function handleSubmit() {
               {{ loading ? "Salvando..." : "Salvar Alterações" }}
             </button>
           </div>
+          <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
         </form>
       </div>
     </div>
