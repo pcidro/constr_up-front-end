@@ -82,6 +82,10 @@
   transition: opacity 0.2s;
 }
 
+.item-description {
+  color: rgb(95, 95, 95);
+}
+
 .action-btn:hover {
   opacity: 0.7;
 }
